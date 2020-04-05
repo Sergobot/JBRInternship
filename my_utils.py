@@ -16,18 +16,19 @@ class ReplayBuffer:
     ReplayBuffer stores replays and samples however many needed when requested
 
     Args:
-        obs_dim (ndarray): Specifies observation shape
-        act_dim (ndarray): Specifies action shape
+        obs_dim (int): Specifies observation shape
+        act_dim (int): Specifies action shape
         size (int): Specifies the limit of how many replays can be stored.
             When reached, old ones are overwritten by newer replays
+        dev (torch.device): Specifies which device to use
     '''
 
-    def __init__(self, obs_dim, act_dim, size):
-        self.obs_buf = np.zeros((size, obs_dim), dtype=np.float32)
-        self.act_buf = np.zeros((size, act_dim), dtype=np.float32)
-        self.rew_buf = np.zeros(size, dtype=np.float32)
-        self.next_obs_buf = np.zeros((size, obs_dim), dtype=np.float32)
-        self.done_buf = np.zeros(size, dtype=np.float32)
+    def __init__(self, obs_dim, act_dim, size, dev):
+        self.obs_buf = torch.zeros((size, obs_dim), dtype=torch.float32).to(dev)
+        self.act_buf = torch.zeros((size, act_dim), dtype=torch.float32).to(dev)
+        self.rew_buf = torch.zeros(size, dtype=torch.float32).to(dev)
+        self.next_obs_buf = torch.zeros((size, obs_dim), dtype=torch.float32).to(dev)
+        self.done_buf = torch.zeros(size, dtype=torch.float32).to(dev)
 
         self.ptr, self.size, self.limit = 0, 0, size
 
@@ -62,13 +63,13 @@ class ReplayBuffer:
             dict: the requested batch
         '''
 
-        idx = np.random.randint(0, self.size, size=batch_size)
+        idx = torch.as_tensor(np.random.randint(0, self.size, size=batch_size), dtype=torch.long)
         return {
-            'obs': torch.as_tensor(self.obs_buf[idx], dtype=torch.float32),
-            'act': torch.as_tensor(self.act_buf[idx], dtype=torch.float32),
-            'rew': torch.as_tensor(self.rew_buf[idx], dtype=torch.float32),
-            'next_obs': torch.as_tensor(self.next_obs_buf[idx], dtype=torch.float32),
-            'done': torch.as_tensor(self.done_buf[idx], dtype=torch.float32)
+            'obs': self.obs_buf[idx],
+            'act': self.act_buf[idx],
+            'rew': self.rew_buf[idx],
+            'next_obs': self.next_obs_buf[idx],
+            'done': self.done_buf[idx]
         }
 
     def __len__(self):
@@ -107,7 +108,7 @@ class Logger():
         self.logs[name] = []
         self.summary_ptrs[name] = 0
 
-        if summary_funcs is list:
+        if isinstance(summary_funcs, list):
             self.summary_funcs[name] = summary_funcs
         else:
             self.summary_funcs[name] = [summary_funcs]
