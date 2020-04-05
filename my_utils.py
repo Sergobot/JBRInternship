@@ -8,8 +8,6 @@ Including:
 
 import torch
 from torch import nn
-import numpy as np
-
 
 class ReplayBuffer:
     '''
@@ -63,7 +61,7 @@ class ReplayBuffer:
             dict: the requested batch
         '''
 
-        idx = torch.as_tensor(np.random.randint(0, self.size, size=batch_size), dtype=torch.long)
+        idx = torch.randint(0, self.size, (batch_size,))
         return {
             'obs': self.obs_buf[idx],
             'act': self.act_buf[idx],
