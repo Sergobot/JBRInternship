@@ -101,6 +101,9 @@ class Logger():
         Args:
             name (str): name of the attribute, use it to store data
             summary_funcs (list(callable(list))): functions to call when summarizing this attribute
+
+        Raises:
+            KeyError: there's already an entry with provided name
         '''
         if name in self.logs.keys():
             raise KeyError(f'Attribute {name} already exits!')
@@ -125,28 +128,36 @@ class Logger():
             raise KeyError(f'No such attribute: {name}')
         self.logs[name].append(value)
 
-    def summarize(self, from_beginning=False):
+    def summarize(self, *, attributes=None, fmt=True, from_beginning=False):
         '''
         Summarize all the attributes using functions provided earlier and put results into a string
 
         Args:
+            attributes (list of str): which attributes to summarize over
             from_beginning (bool): whether to summarize from the beginning or last summarize call
 
         Returns:
             str: summary of stored data
         '''
-        summary_strings = []
-        for attr, log in self.logs.items():
+        summary = []
+        iterate_over = attributes if attributes else self.logs.keys()
+        for attr in iterate_over:
+            log = self.logs[attr]
+
             if from_beginning:
                 ptr = 0
             else:
                 ptr = self.summary_ptrs[attr]
                 self.summary_ptrs[attr] = len(log)
 
-            summary_strings += \
-                [f'{attr}_{f.__name__}={f(log[ptr:]):.4f}' for f in self.summary_funcs[attr]]
+            if fmt:
+                summary += \
+                    [f'{attr}_{f.__name__}={f(log[ptr:]):.4f}' for f in self.summary_funcs[attr]]
+            else:
+                summary += \
+                    [(f'{attr}_{f.__name__}', f(log[ptr:])) for f in self.summary_funcs[attr]]
 
-        return '; '.join(summary_strings)
+        return '; '.join(summary) if fmt else summary
 
 
 def construct_nn(sizes: list, output=nn.Identity):
