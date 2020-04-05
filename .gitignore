@@ -117,3 +117,7 @@ dmypy.json
 .vscode/*
 
 
+# Output directories
+td3/
+ddqn/
+
