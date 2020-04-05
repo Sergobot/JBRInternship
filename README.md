@@ -19,5 +19,5 @@ Even though the training process heavily depends on the CPU, as gym computations
 I made a good use of laptop's built-in GeForce MX150 to speed trainig up almost twice! Especially the
 TD3 algorithm, as its implemetation features larger layers.
 
-[td3]: https://raw.githubusercontent.com/Sergobot/JBRInternship/master/td3.png "Progress of TD3"
-[ddqn]: https://raw.githubusercontent.com/Sergobot/JBRInternship/master/ddqn.png "Progress of DDQN"
+[td3]: td3.png "Progress of TD3"
+[ddqn]: ddqn.png "Progress of DDQN"
