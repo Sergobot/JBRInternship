@@ -1,5 +1,7 @@
-# JetBrains Research Internship
-My solutions to the JetBrains Summer Internship qualification tasks.
+# RL-Playground
+A small project of mine to explore RL algorithms out there in the wild.
+
+As of now, only MountainCar and BipedalWalker environments are solved, but I plan on adding more in the future.
 
 ### TD3 vs BipedalWalker-v3
 
